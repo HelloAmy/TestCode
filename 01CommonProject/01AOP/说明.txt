@@ -1,0 +1,5 @@
+﻿参考博文地址：http://www.cnblogs.com/08shiyan/p/4764074.html
+1、缺点应用到aop的类必须继承：MarshalByRefObject
+2、在使用的时候必须用代理去的创建service对象， 如：
+AOPService1 proxy = DelayProxyUtil.GetTransparentProxy(typeof(AOPService1), service) as AOPService1;
+

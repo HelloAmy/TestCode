@@ -1,0 +1,58 @@
+﻿---------------------------------------------------------------------------------------------------------------------
+Step1: js中，绑定导出按钮的click事件，传入action地址和queryFitler参考，如下：
+
+ $("#btnExportExcel").click(function () {
+                //这里构建好当前的查询条件，也就是queryFilter：
+
+                var queryFilter = new Object();
+                queryFilter.Keyword = '';
+				......
+				......
+
+                $.exportExcel("@Url.Action("ExportExcel")", [{ name: 'queryString', value: $.toJSON(queryFilter) }]);
+            });
+
+----------------------------------------------------------------------------------------------------------------------
+
+Step2:Controller -> 写好相关的导出excel的action方法:
+
+
+ public ActionResult ExportExcel()
+        {
+		    //将json反序列化为queryFilter Entity,设置每个sheet的最大条数:
+            QF_Product productQF = SerializeHelper.JsonDeserialize<QF_Product>(Request.Form["queryString"]);
+            productQF.PageIndex = 0;
+            productQF.PageSize = Int16.MaxValue;
+			//查询源数据并转换为DataTable:
+            QueryResult<QR_Product> result = Rpc.Call<QueryResult<QR_Product>>("ProductService.ProductService.QueryProductList", productQF);
+            List<DataTable> tables = new List<DataTable>();
+
+			//此处为测试代码，所以写了一个for循环，在正式场景中，需要根据需求，查询出1个或者多个List<T>,并且转换为DataTable：
+            for (int i = 0; i < 5; i++)
+            {
+
+                tables.Add(DataMapper.ListToDataTable<QR_Product>(result.data));
+            }
+
+            List<List<ColumnData>> columns = new List<List<ColumnData>>();
+
+			/此处为测试代码，所以写了一个for循环，在正式场景中，需要根据需求，定制各个sheet的列名称：
+            for (int i = 0; i < 5; i++)
+            {
+                List<ColumnData> columndatalist = new List<ColumnData>();
+                columndatalist.Add(new ColumnData { FieldName = "SysNo", Width = 10, Title = LanguageHelper.GetText("编号") });
+                columndatalist.Add(new ColumnData { FieldName = "ProductName", Width = 50, Title = LanguageHelper.GetText("商品名称") });
+                columndatalist.Add(new ColumnData { FieldName = "InDateStr", Width = 10, Title = LanguageHelper.GetText("创建时间") });
+                columns.Add(columndatalist);
+            }
+
+            string fileName = "";
+
+            IFileExport excelExport = new ExcelFileExporter();
+
+			//调用生成excel工作簿的帮助类方法：
+            byte[] excelByte = excelExport.CreateFile(tables, new List<string>() { "自定义sheet_1", "自定义sheet_2", "自定义sheet_3", "自定义sheet_4", "自定义sheet_5" }, columns, null, out fileName, string.Format(LanguageHelper.GetText("{0}-测试导出多sheet"), DateTime.Now.ToShortDateString()));
+
+			//返回文件流：
+            return File(new MemoryStream(excelByte), "application/ms-excel", fileName);
+        }

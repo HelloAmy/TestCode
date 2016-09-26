@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
 using System.Web;
@@ -8,6 +9,15 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using YZ.JsonRpc;
+using YZ.JsonRpc.Client;
+using YZ.Utility;
+using YZ.Utility.DataAccess;
+using YZ.Utility.DataAccess.DbProvider;
+using YZ.Utility.DataAccess.Entity;
+using YZ.Utility.EntityBasic;
+using JsonRequest = YZ.JsonRpc.JsonRequest;
+using JsonResponse = YZ.JsonRpc.JsonResponse;
+using JsonRpcException = YZ.JsonRpc.JsonRpcException;
 
 namespace ServiceHost
 {
@@ -37,7 +47,7 @@ namespace ServiceHost
 
         #region DataCommand ForceWriteDB Handlers
 
-        void DataCommand_OnDataCommandInit(DataCommand cmd)
+        void DataCommand_OnDataCommandInit(YZ.Utility.DataAccess.DataCommand cmd)
         {
             if (cmd.ForceWriteDB == null)
             {
@@ -170,8 +180,8 @@ namespace ServiceHost
                 {
                     //增加前缀Mall区分是商城的日志
                     var categoryName = string.Format("Mall_{0}", rpc.Method.Split('.')[0]);
-                    new SystemLogService().WriteSystemLog(string.Format("{0} - {1}", ex.Message, ex.data), "microService", categoryName,
-                        null, string.Format("url:{0} method:{1}", httpContext == null ? string.Empty : httpContext.Request.Url.ToString(), rpc.Method));
+                    //new SystemLogService().WriteSystemLog(string.Format("{0} - {1}", ex.Message, ex.data), "microService", categoryName,
+                    //    null, string.Format("url:{0} method:{1}", httpContext == null ? string.Empty : httpContext.Request.Url.ToString(), rpc.Method));
                 }
                 catch (Exception writeLogEx)
                 {
@@ -235,13 +245,13 @@ namespace ServiceHost
                 //DataContext.SetContextItem("X-End-Time", endTime);
 
                 // 业务日志，记录服务具体的业务行为。
-                OptLogger.Log(jsonResponse, jsonRequest);
+                //OptLogger.Log(jsonResponse, jsonRequest);
 
                 // 服务跟踪日志，记录时间、性能、异常。
                 if (ConfigurationManager.AppSettings["ServiceTrace-Enabled"] == "true")
                 {
                     DateTime startTime = (DateTime)DataContext.GetContextItem("X-Start-Time");
-                    ServiceTraceLogger.LogAsync(jsonResponse, jsonRequest, startTime, endTime);
+                    //ServiceTraceLogger.LogAsync(jsonResponse, jsonRequest, startTime, endTime);
                 }
             }
             catch

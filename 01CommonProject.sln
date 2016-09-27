@@ -23,27 +23,38 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		QA-Solr|Any CPU = QA-Solr|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CAFDCAB4-ED1B-4855-8EB4-F49DD02E214E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CAFDCAB4-ED1B-4855-8EB4-F49DD02E214E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAFDCAB4-ED1B-4855-8EB4-F49DD02E214E}.QA-Solr|Any CPU.ActiveCfg = Release|Any CPU
+		{CAFDCAB4-ED1B-4855-8EB4-F49DD02E214E}.QA-Solr|Any CPU.Build.0 = Release|Any CPU
 		{CAFDCAB4-ED1B-4855-8EB4-F49DD02E214E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAFDCAB4-ED1B-4855-8EB4-F49DD02E214E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33A9F645-35C6-4F5C-B62C-D6CAF119B893}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33A9F645-35C6-4F5C-B62C-D6CAF119B893}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33A9F645-35C6-4F5C-B62C-D6CAF119B893}.QA-Solr|Any CPU.ActiveCfg = Release|Any CPU
+		{33A9F645-35C6-4F5C-B62C-D6CAF119B893}.QA-Solr|Any CPU.Build.0 = Release|Any CPU
 		{33A9F645-35C6-4F5C-B62C-D6CAF119B893}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33A9F645-35C6-4F5C-B62C-D6CAF119B893}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8AD4C0C6-70AB-47FB-B743-705C0C9D6637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8AD4C0C6-70AB-47FB-B743-705C0C9D6637}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AD4C0C6-70AB-47FB-B743-705C0C9D6637}.QA-Solr|Any CPU.ActiveCfg = Release|Any CPU
+		{8AD4C0C6-70AB-47FB-B743-705C0C9D6637}.QA-Solr|Any CPU.Build.0 = Release|Any CPU
 		{8AD4C0C6-70AB-47FB-B743-705C0C9D6637}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AD4C0C6-70AB-47FB-B743-705C0C9D6637}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D316AF8C-151D-440E-BD4B-9E139022F7C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D316AF8C-151D-440E-BD4B-9E139022F7C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D316AF8C-151D-440E-BD4B-9E139022F7C9}.QA-Solr|Any CPU.ActiveCfg = Release|Any CPU
+		{D316AF8C-151D-440E-BD4B-9E139022F7C9}.QA-Solr|Any CPU.Build.0 = Release|Any CPU
 		{D316AF8C-151D-440E-BD4B-9E139022F7C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D316AF8C-151D-440E-BD4B-9E139022F7C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7307629B-4833-4085-B81F-DB9B3BD308F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7307629B-4833-4085-B81F-DB9B3BD308F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7307629B-4833-4085-B81F-DB9B3BD308F9}.QA-Solr|Any CPU.ActiveCfg = Release|Any CPU
+		{7307629B-4833-4085-B81F-DB9B3BD308F9}.QA-Solr|Any CPU.Build.0 = Release|Any CPU
 		{7307629B-4833-4085-B81F-DB9B3BD308F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7307629B-4833-4085-B81F-DB9B3BD308F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Net;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Web;
-using System.Web.Http;
-using System.Web.Mvc;
-using System.Web.Optimization;
-using System.Web.Routing;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using YZ.JsonRpc;
 using YZ.JsonRpc.Client;
 using YZ.Utility;
@@ -18,13 +22,13 @@ using YZ.Utility.EntityBasic;
 using JsonRequest = YZ.JsonRpc.JsonRequest;
 using JsonResponse = YZ.JsonRpc.JsonResponse;
 using JsonRpcException = YZ.JsonRpc.JsonRpcException;
+using System.Web.Mvc;
+using System.Web.Routing;
+using ServiceHost;
 
-namespace ServiceHost
+namespace YZ.Mall.ServiceHost
 {
-    // 注意: 有关启用 IIS6 或 IIS7 经典模式的说明，
-    // 请访问 http://go.microsoft.com/?LinkId=9394801
-
-    public class MvcApplication : System.Web.HttpApplication
+    public class Global : System.Web.HttpApplication
     {
         protected void Application_Start(object sender, EventArgs e)
         {
@@ -47,7 +51,7 @@ namespace ServiceHost
 
         #region DataCommand ForceWriteDB Handlers
 
-        void DataCommand_OnDataCommandInit(YZ.Utility.DataAccess.DataCommand cmd)
+        void DataCommand_OnDataCommandInit(DataCommand cmd)
         {
             if (cmd.ForceWriteDB == null)
             {
@@ -245,13 +249,13 @@ namespace ServiceHost
                 //DataContext.SetContextItem("X-End-Time", endTime);
 
                 // 业务日志，记录服务具体的业务行为。
-                //OptLogger.Log(jsonResponse, jsonRequest);
+                OptLogger.Log(jsonResponse, jsonRequest);
 
                 // 服务跟踪日志，记录时间、性能、异常。
                 if (ConfigurationManager.AppSettings["ServiceTrace-Enabled"] == "true")
                 {
                     DateTime startTime = (DateTime)DataContext.GetContextItem("X-Start-Time");
-                    //ServiceTraceLogger.LogAsync(jsonResponse, jsonRequest, startTime, endTime);
+                    ServiceTraceLogger.LogAsync(jsonResponse, jsonRequest, startTime, endTime);
                 }
             }
             catch
@@ -276,23 +280,23 @@ namespace ServiceHost
         {
             Rpc.AddGlobalContextSetHandler(
                  (NameValueCollection nameValueCollection) =>
-                 {
-                     nameValueCollection["x-user-UserSysNo"] = DataContextToClientValue("UserSysNo");
-                     nameValueCollection["x-user-UserID"] = DataContextToClientValue("UserID");
-                     nameValueCollection["x-user-UserDisplayName"] = DataContextToClientValue("UserDisplayName");
-                     nameValueCollection["x-user-ApplicationKey"] = DataContextToClientValue("ApplicationKey");
-                     //nameValueCollection["x-user-DataPermission"]                 = DataContextToClientValue("DataPermission");
-                     nameValueCollection["x-user-LoginTime"] = DataContextToClientValue("LoginTime");
-                     nameValueCollection["x-user-SupplierSysNo"] = DataContextToClientValue("SupplierSysNo");
-                     nameValueCollection["x-user-SupplierUserType"] = DataContextToClientValue("SupplierUserType");
-                     nameValueCollection["x-user-ParentSupplierSysNo"] = DataContextToClientValue("ParentSupplierSysNo");
-                     nameValueCollection["x-user-SystemUserType"] = DataContextToClientValue("SystemUserType");
+                {
+                    nameValueCollection["x-user-UserSysNo"] = DataContextToClientValue("UserSysNo");
+                    nameValueCollection["x-user-UserID"] = DataContextToClientValue("UserID");
+                    nameValueCollection["x-user-UserDisplayName"] = DataContextToClientValue("UserDisplayName");
+                    nameValueCollection["x-user-ApplicationKey"] = DataContextToClientValue("ApplicationKey");
+                    //nameValueCollection["x-user-DataPermission"]                 = DataContextToClientValue("DataPermission");
+                    nameValueCollection["x-user-LoginTime"] = DataContextToClientValue("LoginTime");
+                    nameValueCollection["x-user-SupplierSysNo"] = DataContextToClientValue("SupplierSysNo");
+                    nameValueCollection["x-user-SupplierUserType"] = DataContextToClientValue("SupplierUserType");
+                    nameValueCollection["x-user-ParentSupplierSysNo"] = DataContextToClientValue("ParentSupplierSysNo");
+                    nameValueCollection["x-user-SystemUserType"] = DataContextToClientValue("SystemUserType");
 
-                     if (DataContext.GetContextItem("RealIP") != null)
-                     {
-                         nameValueCollection["x-real-ip"] = DataContext.GetContextItem("RealIP").ToString();
-                     }
-                 });
+                    if (DataContext.GetContextItem("RealIP") != null)
+                    {
+                        nameValueCollection["x-real-ip"] = DataContext.GetContextItem("RealIP").ToString();
+                    }
+                });
         }
 
         public static string DataContextToClientValue(string key)
@@ -308,6 +312,5 @@ namespace ServiceHost
         }
 
         #endregion
-
     }
-}  
+}

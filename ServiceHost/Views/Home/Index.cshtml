@@ -1,0 +1,125 @@
+﻿@using YZ.JsonRpc
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>JSON-RPC Help</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/styles.css" rel="stylesheet"/>
+    <style type="text/css">
+        .hl {
+            background-color: yellow
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-default" role="banner">
+        <div class="container">
+            <div class="navbar-header" class="text-center">
+                <h2>
+                    @Html.ActionLink("JSON-RPC Help", "Index")
+                </h2>
+            </div>
+        </div>
+    </nav>
+
+<div class="container">
+    <p><a href="http://www.jsonrpc.org/specification">JSON-RPC 2.0 Specification(English)</a>, 
+    <a href="http://wiki.geekdream.com/Specification/json-rpc_2.0.html">(译) JSON-RPC 2.0 规范(中文版)</a></p>
+    
+    <div class="input-group">
+        <span class="input-group-addon">
+            @{
+            var services = Handler.DefaultHandler.MetaData.Services.OrderBy(s => s.Key);
+        } @services.Count() Services, Filter
+    </span>
+
+    <input id="filter" type="text" class="form-control" placeholder="Type here...">
+</div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th style="width: 25%">Method</th>
+            <th>Description</th>
+            @*<th>Parameters</th>
+            <th>Return</th>*@
+        </tr>
+        </thead>
+        <tbody class="searchable">
+
+            @{
+                foreach (KeyValuePair<string, SMDService> keyValuePair in services)
+                {
+                    string methodName = keyValuePair.Key;
+                    var smdService = keyValuePair.Value;
+                    var methodXmlComment = YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetMethodComment(YZ.JsonRpc.Handler.DefaultHandler.Handlers[methodName].Method);
+
+                    <tr>
+                        <td><a href="method?name=@Url.Encode(methodName)" target="_blank" class="link btn-link"><span>@methodName</span></a></td>
+                        <td>
+                            <span style="color: gray">@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetMethodDescprtionComment(methodXmlComment)</span>
+                        </td>
+                        @*<td>
+                            @{
+                                foreach (SMDAdditionalParameters param in smdService.parameters)
+                                {
+                                    <code class="small" style="margin-right: 10px">
+                                        <span style="color: blue">@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetCSharpRepresentation(param.ObjectType)</span>
+                                        <span style="color: cadetblue">@param.Name</span>
+                                        <span style="color: gray">@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetMethodParameterComment(methodXmlComment, param.Name)</span>
+                                    </code>
+                                }
+                            }
+                        </td>
+                        <td>
+                            <code class="small">
+                                <span style="color: blue">@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetCSharpRepresentation(smdService.returns.ObjectType)</span>
+                                <span style="color: gray">@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetMethodReturnsComment(methodXmlComment)</span>
+                            </code>
+                        </td>*@
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+
+    <script src="~/Scripts/jquery.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/scripts.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            (function ($) {
+
+                $('#filter').keyup(function () {
+                    
+                    var rex1 = new RegExp($(this).val(), 'i');
+                    var rex2 = new RegExp('(' + $(this).val() + ')', 'i');
+                    var rex3 = new RegExp('<span class="hl">(.*)</span>','i');
+
+                    $('.searchable tr').hide();
+                    $('.searchable tr td span').each(function (index, value) {
+                        value.innerHTML = value.innerHTML.replace(rex3, "$1");
+                    });
+                    $('.searchable tr').filter(function () {
+                        return rex1.test($(this).text());
+                    }).show();
+                    $('.searchable tr td span').each(function(index, value) {
+                        value.innerHTML = value.innerHTML.replace(rex2, '<span class="hl">$1</span>');
+                    });
+                })
+
+            }(jQuery));
+
+        });
+    </script>
+</body>
+</html>

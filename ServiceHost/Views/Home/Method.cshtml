@@ -1,0 +1,164 @@
+﻿@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using YZ.JsonRpc
+@using YZ.JsonRpc.AspNet
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>JSON-RPC Help - @Request.Params["name"]</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet"/>
+    <link href="~/Content/styles.css" rel="stylesheet"/>
+    <link href="~/Scripts/highlight/styles/default.css" rel="stylesheet"/>
+    <style type="text/css">h4 {margin-top:20px}</style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="banner">
+    <div class="container">
+        <div class="navbar-header" class="text-center">
+            <h2>
+                @Html.ActionLink("JSON-RPC Help", "Index")
+            </h2>
+        </div>
+    </div>
+</nav>
+<div class="container">
+
+    @{
+        string methodName = Request.Params["name"];
+        if (!Handler.DefaultHandler.MetaData.Services.ContainsKey(methodName))
+        {
+            <p style="font-size: 24px; color: red">
+                Sorry, Not found this method: <code>@methodName</code>
+            </p>
+        }
+        else
+        {
+            var smdService = Handler.DefaultHandler.MetaData.Services[methodName];
+            var methodXmlComment = YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetMethodComment(YZ.JsonRpc.Handler.DefaultHandler.Handlers[methodName].Method);
+
+
+            <h4>
+                <code>@Request.Params["name"]</code>
+            </h4>
+        
+            <h3>@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetMethodDescprtionComment(methodXmlComment)</h3>
+            
+            <h4>Parameters:</h4>
+            <table class="table-bordered table-condensed" style="margin-left: 40px;">
+                <thead>
+                <tr style="background-color: gainsboro">
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                @if (smdService.parameters == null || smdService.parameters.Count() == 0)
+                {
+                    <tr>
+                        <td colspan="3">No parameters.</td>
+                    </tr>
+                }
+                @{
+                    foreach (SMDAdditionalParameters param in smdService.parameters)
+                    {
+                        <tr>
+                            <td style="color: cadetblue">@param.Name</td>
+                            <td style="color: blue">@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetCSharpRepresentation(param.ObjectType)</td>
+                            <td style="color: gray">@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetMethodParameterComment(methodXmlComment, param.Name)</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+
+            <h4>Returns:
+            <span style="font-size: 14px">
+                <span style="color: blue">@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetCSharpRepresentation(smdService.returns.ObjectType)</span>
+                <span style="color: gray">@YZ.Mall.ServiceHost.App_Code.MethodDescriptor.GetMethodReturnsComment(methodXmlComment)</span>
+            </span></h4>
+
+
+            <h4>Sample:</h4>
+            <h5>Request: <button class="btn btn-primary" id="btnTryIt">Try it</button></h5>
+            <pre class="small" style="background-color: #F0F0F0"><code contenteditable="true" id="txtRequest" spellcheck="false" class="json">@{
+                                                                                                                                                  JsonRequest jsonRequest = new JsonRequest();
+                                                                                                                                                  jsonRequest.Method = methodName;
+                                                                                                                                                  jsonRequest.Id = 1;
+                                                                                                                                                  jsonRequest.Params = new JObject();
+                                                                                                                                                  foreach (var param in smdService.parameters)
+                                                                                                                                                  {
+                                                                                                                                                      ((JObject) jsonRequest.Params).Add(param.Name, new JRaw(JsonConvert.SerializeObject(new SampleBuilder().BuildSampleObject(param.ObjectType), Formatting.Indented)));
+                                                                                                                                                  }
+                                                                                                                                                  @Html.Raw(JsonConvert.SerializeObject(jsonRequest))
+                                                                                                                                              }</code></pre>
+
+
+    <div style="display: inline" id="divResponse">
+        <h5 style="display: inline">Response:</h5>
+        <label id="lbResponseStatus" style="display: inline;color:InfoText"></label>
+    </div>
+            <pre class="small" style="background-color: #F0F0F0"><code id="txtResponse" spellcheck="false" class="json">@{
+                                                                                                                                                  JsonResponse jsonResponse = new JsonResponse();
+                                                                                                                                                   jsonResponse.Id = 1;
+                                                                                                                                                   jsonResponse.Result = new SampleBuilder().BuildSampleObject(smdService.returns.ObjectType);
+                                                                                                                                                   @Html.Raw(JsonConvert.SerializeObject(jsonResponse))
+                                                                                                                                               }</code></pre>
+        }
+    }
+
+
+</div>
+<script src="~/Scripts/jquery.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/highlight/highlight.pack.js"></script>
+<script src="~/Scripts/scripts.js"></script>
+
+<script type="text/javascript">
+    
+    hljs.initHighlightingOnLoad();
+
+    $(function () {
+        $('#txtRequest').text(formatJSON($('#txtRequest').text()));
+        $('#txtResponse').text(formatJSON($('#txtResponse').text()));
+
+        $('#btnTryIt').click(function() {
+            $('#lbResponseStatus').text('In processing, please wait for a moment...');
+            var startTime = new Date();
+            $.ajax({
+                type: 'POST',
+                url: 'json.rpc',
+                data: $('#txtRequest').text(),
+                dataType: 'text'
+            }).done(function(data, textStatus, jqXHR) {
+                var endTime = new Date();
+                
+                var formatedData = formatJSON(data);
+                $('#txtResponse').text(formatedData);
+                var diffms = GetDateDiff(startTime, endTime, 'ms');
+                var diffText = diffms + ' milliseconds';
+                if (diffms > 1000) {
+                    diffText = diffms / 1000 + ' seconds';
+                }
+                $('#lbResponseStatus').text('Has returned the result length: ' + data.length + ' chars, with the time of ' + diffText);
+
+                if (formatedData.length <= 5000) //JsonRepsone内容太长时，高亮处理容易造成CPU占满卡死浏览器，故超过5000字符就不高亮。
+                    hljs.highlightBlock($('#txtResponse')[0]);
+
+                scroll(null, document.getElementById('divResponse').offsetTop);
+            });
+        });
+    });
+</script>
+    
+        
+    
+</body>
+</html>

@@ -37,6 +37,15 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="YZ.JsonRpc">
+      <HintPath>..\PublicDLL\YZ.JsonRpc.dll</HintPath>
+    </Reference>
+    <Reference Include="YZ.JsonRpc.Client">
+      <HintPath>..\PublicDLL\YZ.JsonRpc.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="YZ.Utility">
+      <HintPath>..\PublicDLL\YZ.Utility.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonService.cs" />
